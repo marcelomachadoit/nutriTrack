@@ -571,7 +571,7 @@ const TRANSLATIONS = [
   ['Séries de {0}', 'Sets for {0}', 'Series de {0}'],
   ['Repetições de {0}', 'Reps for {0}', 'Repeticiones de {0}'],
   ['Incluir exercício', 'Add exercise', 'Agregar ejercicio'],
-  ['Buscar por nome ou músculo...', 'Search by name or muscle...', 'Buscar por nombre o músculo...'],
+  ['Nome ou músculo...', 'Name or muscle...', 'Nombre o músculo...'],
   ['Exercício', 'Exercise', 'Ejercicio'],
   ['Trocar a ficha em edição pelo modelo {0}? Nada é salvo até você tocar em "Salvar ficha".', 'Replace the plan you are editing with the {0} template? Nothing is saved until you tap "Save plan".', '¿Cambiar la rutina en edición por la plantilla {0}? No se guarda nada hasta que toques "Guardar rutina".'],
   ['Ficha salva.', 'Plan saved.', 'Rutina guardada.'],

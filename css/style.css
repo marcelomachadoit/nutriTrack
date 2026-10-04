@@ -1190,13 +1190,21 @@ input {
   overflow: visible;
 }
 
+/* Quando o botão tocado é redesenhado, o foco cai no próprio diálogo (o cartão rola, então
+   o Chrome o deixa focável): contorno em volta do diálogo inteiro não ajuda ninguém. */
+.modal:focus-visible,
+.modal-card:focus-visible { outline: none; }
 .modal::backdrop { background: rgba(6, 10, 22, .62); backdrop-filter: blur(3px); }
 .modal[open] { animation: panel-in .26s var(--ease); }
 
 .modal-card {
   display: grid;
   gap: 14px;
+  /* Coluna com mínimo zero: nenhum conteúdo alarga o diálogo além da tela. */
+  grid-template-columns: minmax(0, 1fr);
   max-height: 88vh;
+  /* dvh desconta as barras do navegador no celular; 88vh fica de reserva. */
+  max-height: 88dvh;
   overflow-y: auto;
   padding: clamp(18px, 4vw, 26px);
   background: var(--surface);
@@ -1222,7 +1230,7 @@ input {
 
 .modal-close:hover { background: var(--brand-soft); color: var(--brand); }
 .modal-hint { margin: 0; font-size: 12.5px; color: var(--muted); }
-.modal-body { display: grid; gap: 14px; }
+.modal-body { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; }
 .modal-feedback { margin: 0; min-height: 16px; font-size: 12.5px; color: var(--brand); }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
 .modal-actions .primary-button, .modal-actions .secondary-button { min-width: 150px; }
@@ -2411,6 +2419,7 @@ input {
 
 .plan-workout {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   padding: 14px;
   border-radius: var(--radius-md);
@@ -2463,6 +2472,23 @@ input {
 .plan-items .empty-state { padding: 18px; }
 
 .plan-cycle { margin: 0; font-size: 12.5px; color: var(--muted); }
+
+/* A ficha é longa: Salvar e Cancelar ficam presos no rodapé do diálogo enquanto ele rola. */
+#plan-dialog .modal-actions {
+  position: sticky;
+  bottom: calc(clamp(18px, 4vw, 26px) * -1);
+  z-index: 2;
+  margin-bottom: calc(clamp(18px, 4vw, 26px) * -1);
+  padding: 12px 0 clamp(18px, 4vw, 26px);
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  flex-direction: row;
+}
+
+/* Lado a lado mesmo no celular: empilhados, os dois botões tomariam um terço da tela. */
+#plan-dialog .modal-actions .primary-button,
+#plan-dialog .modal-actions .secondary-button { flex: 1; min-width: 0; width: auto; }
+#plan-dialog .modal-actions .secondary-button { order: -1; }
 .plan-cycle strong { color: var(--ink); }
 
 .plan-workout.is-rest { border-style: dashed; }
@@ -2472,13 +2498,16 @@ input {
 .plan-workout.is-rest .plan-workout-head { align-items: center; }
 .plan-workout.is-rest .item-actions { padding-bottom: 0; }
 
-.plan-picker { display: grid; gap: 8px; }
+.plan-picker { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
 
-/* Lista própria no lugar do select nativo: as cores seguem o tema do app. */
+/* Lista própria no lugar do select nativo: as cores seguem o tema do app.
+   A altura acompanha a tela para sempre sobrar diálogo para arrastar, e a rolagem passa
+   para o diálogo quando a lista chega ao fim (nada de overscroll-behavior: contain, que
+   prendia o dedo dentro da lista no celular). */
 .picker-results {
-  max-height: 280px;
+  max-height: min(280px, 38vh);
+  max-height: min(280px, 38dvh);
   overflow-y: auto;
-  overscroll-behavior: contain;
   border-radius: var(--radius-sm);
   background: var(--surface);
   border: 1px solid var(--line-strong);

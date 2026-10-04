@@ -850,7 +850,7 @@ function buildPlanPicker(workout, letra) {
   const buscaInput = document.createElement('input');
   buscaInput.type = 'search';
   buscaInput.autocomplete = 'off';
-  buscaInput.placeholder = t('Buscar por nome ou músculo...');
+  buscaInput.placeholder = t('Nome ou músculo...');
   buscaInput.value = planPickerTerm;
   buscaControle.append(createIcon('i-search'), buscaInput);
   busca.append(buscaRotulo, buscaControle);
