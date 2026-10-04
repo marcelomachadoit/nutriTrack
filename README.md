@@ -119,6 +119,30 @@ Os valores vêm de `data/tabela-nutricional.txt`, que é a fonte da verdade — 
 - `portion_label` e `portion_amount` com a porção comum aproximada (ex.: `1 xícara (150 g)` / `150`), nula nas bebidas alcoólicas;
 - quantidades intermediárias são calculadas por regra de três em `calculateNutrition()`.
 
+## FitTrack (treinos)
+
+O mesmo app tem uma segunda seção, o **FitTrack**, para acompanhar a academia. O nome na barra superior ("NutriTrack") é um botão: ele abre um menu com NutriTrack e FitTrack. A escolha fica salva no aparelho (`nutritrack-app-mode`), então o app reabre na última seção usada. Conta, tema, idioma e Perfil são os mesmos nas duas.
+
+O FitTrack tem três abas:
+
+- **Treino** (início): mostra o treino do dia (A, B, C...) e, para cada exercício, o que foi feito no treino anterior (carga, séries e repetições) com o botão **Novos dados** ao lado, para registrar o valor de hoje. Depois de registrado, o botão passa a mostrar o valor do dia e a diferença de carga em relação ao anterior. Registrar de novo no mesmo dia substitui o valor.
+- **Estatísticas**: com filtro de período (4 semanas, 12 semanas ou tudo) no topo e um resumo do período (treinos, séries, carga total e recordes batidos). Abaixo:
+  - **Evolução por exercício** — gráfico de linha de um exercício escolhido, em carga, 1RM estimado (fórmula de Epley) ou volume (carga × séries × repetições). Exercício feito só com o peso do corpo mostra repetições. Pontos com anel são recordes de carga.
+  - **Volume semanal** — barras por semana (segunda a domingo) em séries ou carga total, e a lista de séries por grupo muscular no período.
+  - **Recordes pessoais** — a maior carga de cada exercício em todo o histórico, com o 1RM estimado daquele dia; recorde batido nos últimos 7 dias ganha o selo "Novo".
+  - **Treinos recentes** — os últimos 8 dias com treino, com exercícios, séries e carga total.
+
+  Os gráficos mostram valores ao passar o mouse ou tocar, e cada um tem uma tabela com os mesmos números ("Ver em tabela"). Tudo é calculado no aparelho a partir de `exercise_logs` (`js/fit-stats.js`); não há tabela de agregados. Ao registrar uma carga maior que todas as anteriores do exercício, a aba Treino avisa o novo recorde.
+- **Exercícios**: banco de exercícios com busca, filtro por grupo muscular e cadastro de exercícios próprios (nome + grupo muscular principal), visíveis só na conta de quem criou.
+
+**Ficha, ciclo e descansos.** Cada conta tem uma ficha (`public.workout_plans`): a sequência de dias do ciclo, com até 7 treinos (A a G, na ordem em que aparecem) e dias de **descanso**, num total de até 14 posições. Uma conta nova começa com **A → B → C → descanso** (os três primeiros dias da planilha). Em **Editar ficha** dá para acrescentar ou remover treinos e descansos, mudar a ordem com as setas, renomear, incluir/remover exercícios numa lista com busca agrupada por músculo, ajustar séries e repetições e arrastar os exercícios para reordenar. As abas quebram linha, então todas ficam à vista mesmo com muitos treinos. Os modelos prontos já trazem descansos: AB (A, B, descanso), ABC (A, B, C, descanso), ABCD (A, B, descanso, C, D, descanso) e ABCDE (a planilha de 5 dias: cinco treinos e dois descansos). Nada é gravado até tocar em **Salvar ficha**.
+
+Cada dia do calendário avança uma posição do ciclo e volta ao começo depois da última (`workoutIndexFor()` em `js/fit.js`, a partir de `anchor_date` / `anchor_index`). A tela de treino mostra os **próximos 7 dias** com o treino ou o descanso de cada um. Em dia de descanso o card principal fica violeta, sem contadores, e mostra o próximo treino, com a opção "Treinar mesmo assim". Para trocar o dia de hoje, toque em outro treino (ou num descanso) e em **Fazer o X hoje** / **Descansar hoje**: o ciclo passa a continuar a partir dali. Reordenar a ficha não muda o que cai hoje.
+
+**Banco de dados.** Rode `supabase.sql` (que cria `exercises`, `workout_plans` e `exercise_logs`, com RLS — rode de novo se já tinha rodado antes dos dias de descanso, para atualizar o limite da ficha) e depois `supabase-exercises.sql`, que carrega 75 exercícios — os da planilha e outros populares — com nome em português, inglês e espanhol e o grupo muscular principal. A carga é idempotente e usa o `slug` de cada exercício como identidade; os modelos de ficha apontam para esses slugs. Os registros (`exercise_logs`) apontam para o exercício e não para a ficha, então mudar a ficha não apaga histórico; excluir um exercício próprio apaga os registros dele.
+
+Os nomes dos treinos da ficha são dados do usuário: nascem no idioma em uso quando a ficha é criada e não mudam ao trocar de idioma, como os nomes das refeições.
+
 ## Cloudflare Pages
 
 Envie o projeto para GitHub, conecte o repositório no Cloudflare Pages, deixe o comando de build vazio e use a raiz como diretório de saída.

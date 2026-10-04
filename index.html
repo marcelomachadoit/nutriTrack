@@ -50,6 +50,11 @@
     <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9.4 5.6 6.4 6.4-6.4 6.4"/></symbol>
     <symbol id="i-globe" viewBox="0 0 24 24"><path d="M12 20.8a8.8 8.8 0 1 0 0-17.6 8.8 8.8 0 0 0 0 17.6Z"/><path d="M3.2 12h17.6"/><path d="M12 3.2c2.4 2.4 3.6 5.3 3.6 8.8s-1.2 6.4-3.6 8.8c-2.4-2.4-3.6-5.3-3.6-8.8s1.2-6.4 3.6-8.8Z"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.6 6.6 17.4 17.4"/><path d="M17.4 6.6 6.6 17.4"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6.4 9.4 5.6 5.6 5.6-5.6"/></symbol>
+    <symbol id="i-dumbbell" viewBox="0 0 24 24"><rect x="5.4" y="6.4" width="3" height="11.2" rx="1.1"/><rect x="15.6" y="6.4" width="3" height="11.2" rx="1.1"/><path d="M3.2 9.6v4.8M20.8 9.6v4.8M8.4 12h7.2"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9.2 6.6h10.6M9.2 12h10.6M9.2 17.4h10.6"/><path d="M4.6 6.6h.01M4.6 12h.01M4.6 17.4h.01"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5.2 12.6 4.4 4.4 9.2-9.6"/></symbol>
+    <symbol id="i-history" viewBox="0 0 24 24"><path d="M4.2 12a7.8 7.8 0 1 0 2.3-5.5L4.2 8.8"/><path d="M4.2 4.4v4.4h4.4"/><path d="M12 8v4.4l2.8 1.8"/></symbol>
   </svg>
 
   <div class="auth-gate" id="auth-gate">
@@ -139,10 +144,23 @@
 
   <div class="app-shell" id="app-shell" hidden>
     <header class="topbar">
-      <a class="brand" href="#inicio" aria-label="NutriTrack, início">
-        <img src="logo.png" alt="" width="40" height="40" decoding="async">
-        <span>Nutri<span>Track</span></span>
-      </a>
+      <div class="app-switch">
+        <button class="brand" type="button" data-action="app-switch" aria-haspopup="menu" aria-expanded="false" aria-controls="app-menu" title="Trocar de aplicativo">
+          <img src="logo.png" alt="" width="40" height="40" decoding="async">
+          <span class="brand-name" id="brand-name">Nutri<span>Track</span></span>
+          <svg class="icon brand-caret"><use href="#i-chevron-down"></use></svg>
+        </button>
+        <div class="lang-menu app-menu" id="app-menu" role="menu" aria-label="Aplicativos" hidden>
+          <button type="button" role="menuitemradio" data-app-mode="nutri" aria-checked="true">
+            <span class="app-menu-icon nutri"><svg class="icon"><use href="#i-bowl"></use></svg></span>
+            <span class="app-menu-text"><strong>NutriTrack</strong><small>Alimentação e calorias</small></span>
+          </button>
+          <button type="button" role="menuitemradio" data-app-mode="fit" aria-checked="false">
+            <span class="app-menu-icon fit"><svg class="icon"><use href="#i-dumbbell"></use></svg></span>
+            <span class="app-menu-text"><strong>FitTrack</strong><small>Treinos e cargas</small></span>
+          </button>
+        </div>
+      </div>
       <div class="topbar-actions">
         <button class="icon-button theme-button" type="button" data-action="theme" aria-label="Alternar tema claro e escuro">
           <svg class="icon icon-sun"><use href="#i-sun"></use></svg>
@@ -431,9 +449,205 @@
           </button>
         </form>
       </section>
+
+      <!-- FitTrack -->
+      <section class="view" data-view="treino">
+        <div class="welcome-row">
+          <div>
+            <p class="eyebrow" id="fit-today-label">HOJE</p>
+            <h1 id="fit-hello">Bora treinar</h1>
+            <p class="muted" id="fit-greeting">Veja o treino do dia e registre suas cargas.</p>
+          </div>
+          <button class="pill-button ghost" type="button" data-action="edit-plan">
+            <svg class="icon"><use href="#i-edit"></use></svg>Editar ficha
+          </button>
+        </div>
+
+        <div class="workout-tabs" id="workout-tabs" role="group" aria-label="Treinos da ficha"></div>
+        <p class="fit-week-label">Próximos 7 dias</p>
+        <div class="fit-week" id="fit-week" role="group" aria-label="Próximos 7 dias"></div>
+        <div class="workout-note" id="workout-note" hidden></div>
+
+        <section class="hero-card fit-hero">
+          <div class="hero-content">
+            <p class="card-kicker"><svg class="icon"><use href="#i-sparkle"></use></svg><span id="fit-kicker">TREINO DE HOJE</span></p>
+            <h2 id="fit-workout-title">—</h2>
+            <div class="hero-stats">
+              <div><span>Exercícios</span><strong id="fit-exercise-count">0</strong></div>
+              <div><span>Séries</span><strong id="fit-set-count">0</strong></div>
+            </div>
+          </div>
+          <div class="calorie-ring">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <defs>
+                <linearGradient id="fit-ring-gradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#ff5f6d"></stop>
+                  <stop offset="100%" stop-color="#ffb457"></stop>
+                </linearGradient>
+              </defs>
+              <circle class="ring-track" cx="60" cy="60" r="52"></circle>
+              <circle class="ring-value fit-ring-value" id="fit-ring-progress" cx="60" cy="60" r="52"></circle>
+            </svg>
+            <div class="ring-center">
+              <strong id="fit-done-count">0</strong>
+              <span id="fit-done-label">de 0 feitos</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">SEU TREINO</p>
+            <h2>Exercícios</h2>
+          </div>
+        </div>
+        <section class="lift-list" id="lift-list" aria-label="Exercícios do treino"></section>
+      </section>
+
+      <section class="view" data-view="fit-progresso">
+        <div class="page-heading heading-with-actions">
+          <div>
+            <p class="eyebrow">EVOLUÇÃO</p>
+            <h1>Estatísticas</h1>
+            <p class="muted">Gráficos, tabelas e recordes dos seus treinos.</p>
+          </div>
+          <div class="segmented compact" role="group" aria-label="Período">
+            <button class="segment" type="button" data-stats-range="28" aria-pressed="false">4 semanas</button>
+            <button class="segment" type="button" data-stats-range="84" aria-pressed="false">12 semanas</button>
+            <button class="segment" type="button" data-stats-range="all" aria-pressed="false">Tudo</button>
+          </div>
+        </div>
+
+        <div class="week-stats fit-summary" id="fit-summary"></div>
+
+        <section class="chart-card" aria-labelledby="fit-load-title">
+          <div class="week-head">
+            <div>
+              <p class="eyebrow">CARGA</p>
+              <h2 id="fit-load-title">Evolução por exercício</h2>
+            </div>
+          </div>
+          <div class="stats-controls">
+            <label class="field">
+              <span class="field-label">Exercício</span>
+              <span class="field-control">
+                <select id="stats-exercise"></select>
+              </span>
+            </label>
+            <div class="segmented compact" id="stats-metric" role="group" aria-label="Medida do gráfico">
+              <button class="segment" type="button" data-stats-metric="weight" aria-pressed="false">Carga</button>
+              <button class="segment" type="button" data-stats-metric="e1rm" aria-pressed="false">1RM estimado</button>
+              <button class="segment" type="button" data-stats-metric="volume" aria-pressed="false">Volume</button>
+            </div>
+          </div>
+          <div class="week-stats" id="lift-stats"></div>
+          <div class="weight-chart" id="lift-chart"></div>
+          <p class="field-note stats-note" id="lift-note"></p>
+          <details class="week-table">
+            <summary>Ver em tabela</summary>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th scope="col">Data</th><th scope="col">Carga</th><th scope="col">Séries × reps</th><th scope="col">1RM est.</th><th scope="col">Volume</th></tr></thead>
+                <tbody id="lift-table-body"></tbody>
+              </table>
+            </div>
+          </details>
+        </section>
+
+        <section class="chart-card" aria-labelledby="fit-volume-title">
+          <div class="week-head">
+            <div>
+              <p class="eyebrow">VOLUME</p>
+              <h2 id="fit-volume-title">Volume semanal</h2>
+            </div>
+            <div class="segmented compact" role="group" aria-label="Medida do volume">
+              <button class="segment" type="button" data-volume-metric="sets" aria-pressed="false">Séries</button>
+              <button class="segment" type="button" data-volume-metric="volume" aria-pressed="false">Carga total</button>
+            </div>
+          </div>
+          <div class="weight-chart bar-chart" id="volume-chart"></div>
+          <details class="week-table">
+            <summary>Ver em tabela</summary>
+            <div class="table-scroll">
+              <table>
+                <thead><tr><th scope="col">Semana</th><th scope="col">Treinos</th><th scope="col">Séries</th><th scope="col">Carga total</th></tr></thead>
+                <tbody id="volume-table-body"></tbody>
+              </table>
+            </div>
+          </details>
+          <div class="muscle-section">
+            <h3>Séries por grupo muscular</h3>
+            <p class="field-note">Soma das séries registradas no período escolhido.</p>
+            <div class="muscle-bars" id="muscle-bars"></div>
+          </div>
+        </section>
+
+        <section class="chart-card" aria-labelledby="fit-records-title">
+          <div class="week-head">
+            <div>
+              <p class="eyebrow">RECORDES</p>
+              <h2 id="fit-records-title">Recordes pessoais</h2>
+            </div>
+          </div>
+          <p class="field-note stats-note">A maior carga de cada exercício em todo o histórico, com o 1RM estimado daquele dia.</p>
+          <div class="table-scroll records-scroll">
+            <table class="records-table">
+              <thead><tr><th scope="col">Exercício</th><th scope="col">Melhor carga</th><th scope="col">1RM est.</th><th scope="col">Data</th></tr></thead>
+              <tbody id="records-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="chart-card" aria-labelledby="fit-history-title">
+          <div class="week-head">
+            <div>
+              <p class="eyebrow">HISTÓRICO</p>
+              <h2 id="fit-history-title">Treinos recentes</h2>
+            </div>
+          </div>
+          <ul class="history-list" id="history-list"></ul>
+        </section>
+      </section>
+
+      <section class="view" data-view="exercicios">
+        <div class="page-heading heading-with-actions">
+          <div>
+            <p class="eyebrow">TREINO</p>
+            <h1>Banco de exercícios</h1>
+            <p class="muted">Consulte os exercícios e cadastre os que faltarem.</p>
+          </div>
+          <div class="heading-actions">
+            <button class="pill-button" type="button" data-action="new-exercise">
+              <svg class="icon"><use href="#i-plus"></use></svg>Adicionar exercício
+            </button>
+          </div>
+        </div>
+        <label class="search-box">
+          <svg class="icon"><use href="#i-search"></use></svg>
+          <input id="exercise-search" type="search" placeholder="Pesquisar exercício..." aria-label="Pesquisar exercício">
+        </label>
+        <div class="chip-row muscle-filter" id="muscle-filter" role="group" aria-label="Filtrar por grupo muscular"></div>
+        <p class="list-count" id="exercise-count"></p>
+        <div class="food-list exercise-list" id="exercise-list"></div>
+      </section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Navegação principal">
+    <nav class="bottom-nav fit-nav" data-app-nav="fit" aria-label="Navegação do FitTrack" hidden>
+      <button class="nav-item" type="button" data-target="treino">
+        <svg class="icon"><use href="#i-dumbbell"></use></svg><small>Treino</small>
+      </button>
+      <button class="nav-item" type="button" data-target="fit-progresso">
+        <svg class="icon"><use href="#i-chart"></use></svg><small>Estatísticas</small>
+      </button>
+      <button class="nav-item" type="button" data-target="exercicios">
+        <svg class="icon"><use href="#i-list"></use></svg><small>Exercícios</small>
+      </button>
+      <button class="nav-item" type="button" data-target="perfil">
+        <svg class="icon"><use href="#i-user"></use></svg><small>Perfil</small>
+      </button>
+    </nav>
+
+    <nav class="bottom-nav" data-app-nav="nutri" aria-label="Navegação principal">
       <button class="nav-item active" type="button" data-target="inicio">
         <svg class="icon"><use href="#i-home"></use></svg><small>Início</small>
       </button>
@@ -791,6 +1005,113 @@
     </div>
   </dialog>
 
+  <dialog class="modal" id="lift-dialog" aria-labelledby="lift-dialog-title">
+    <form class="modal-card" id="lift-form">
+      <header class="modal-header">
+        <h2 id="lift-dialog-title">Novos dados</h2>
+        <button class="modal-close" type="button" data-close-dialog="lift-dialog" aria-label="Fechar">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+      <p class="modal-hint" id="lift-dialog-hint"></p>
+      <div class="modal-body">
+        <div class="lift-previous" id="lift-previous"></div>
+        <div class="field-row lift-fields">
+          <label class="field">
+            <span class="field-label">Carga</span>
+            <span class="field-control">
+              <input id="lift-weight" type="number" min="0" max="1000" step="any" inputmode="decimal" placeholder="0" required>
+              <b class="field-suffix">kg</b>
+            </span>
+          </label>
+          <label class="field">
+            <span class="field-label">Séries</span>
+            <span class="field-control">
+              <input id="lift-sets" type="number" min="1" max="20" step="1" inputmode="numeric" placeholder="3" required>
+            </span>
+          </label>
+          <label class="field">
+            <span class="field-label">Repetições</span>
+            <span class="field-control">
+              <input id="lift-reps" type="number" min="1" max="200" step="1" inputmode="numeric" placeholder="10" required>
+            </span>
+          </label>
+        </div>
+        <p class="field-note">Use 0 kg nos exercícios feitos só com o peso do corpo.</p>
+      </div>
+      <p class="modal-feedback" id="lift-feedback"></p>
+      <footer class="modal-actions">
+        <button class="secondary-button danger-outline" type="button" id="lift-delete" hidden>
+          <svg class="icon"><use href="#i-trash"></use></svg>Apagar registro
+        </button>
+        <button class="secondary-button" type="button" data-close-dialog="lift-dialog">Cancelar</button>
+        <button class="primary-button" type="submit" id="lift-submit">Salvar</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="plan-dialog" aria-labelledby="plan-dialog-title">
+    <form class="modal-card" id="plan-form">
+      <header class="modal-header">
+        <h2 id="plan-dialog-title">Editar ficha</h2>
+        <button class="modal-close" type="button" data-close-dialog="plan-dialog" aria-label="Fechar">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+      <p class="modal-hint">Monte o ciclo do seu jeito: acrescente ou remova treinos (AB, ABC, ABCD...) e dias de descanso, mude a ordem com as setas e escolha os exercícios de cada treino. Cada dia do calendário avança uma posição do ciclo.</p>
+      <div class="modal-body">
+        <div class="plan-templates">
+          <span class="field-label">Começar de um modelo</span>
+          <div class="chip-row" role="group" aria-label="Modelos de ficha">
+            <button class="chip" type="button" data-template="AB">AB</button>
+            <button class="chip" type="button" data-template="ABC">ABC</button>
+            <button class="chip" type="button" data-template="ABCD">ABCD</button>
+            <button class="chip" type="button" data-template="ABCDE">ABCDE</button>
+          </div>
+        </div>
+        <p class="plan-cycle" id="plan-cycle"></p>
+        <div class="plan-tabs" id="plan-tabs"></div>
+        <div class="plan-workout" id="plan-workout"></div>
+      </div>
+      <p class="modal-feedback" id="plan-feedback"></p>
+      <footer class="modal-actions">
+        <button class="secondary-button" type="button" data-close-dialog="plan-dialog">Cancelar</button>
+        <button class="primary-button" type="submit" id="plan-submit">Salvar ficha</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="exercise-dialog" aria-labelledby="exercise-dialog-title">
+    <form class="modal-card" id="exercise-form">
+      <header class="modal-header">
+        <h2 id="exercise-dialog-title">Novo exercício</h2>
+        <button class="modal-close" type="button" data-close-dialog="exercise-dialog" aria-label="Fechar">
+          <svg class="icon"><use href="#i-close"></use></svg>
+        </button>
+      </header>
+      <p class="modal-hint">O exercício fica visível só na sua conta e pode entrar na sua ficha.</p>
+      <div class="modal-body">
+        <label class="field">
+          <span class="field-label">Nome</span>
+          <span class="field-control">
+            <input id="exercise-name" type="text" required maxlength="120" placeholder="Ex.: Remada no smith">
+          </span>
+        </label>
+        <label class="field">
+          <span class="field-label">Grupo muscular principal</span>
+          <span class="field-control">
+            <select id="exercise-muscle"></select>
+          </span>
+        </label>
+      </div>
+      <p class="modal-feedback" id="exercise-feedback"></p>
+      <footer class="modal-actions">
+        <button class="secondary-button" type="button" data-close-dialog="exercise-dialog">Cancelar</button>
+        <button class="primary-button" type="submit" id="exercise-submit">Salvar exercício</button>
+      </footer>
+    </form>
+  </dialog>
+
   <div class="toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -803,7 +1124,10 @@
   <script src="js/recipes.js"></script>
   <script src="js/goals.js"></script>
   <script src="js/weight.js"></script>
+  <script src="js/fit.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/fit-ui.js"></script>
+  <script src="js/fit-stats.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

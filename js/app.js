@@ -26,11 +26,12 @@ async function initializeApp() {
     loadRecipes().catch(() => showToast(t('Não foi possível carregar suas receitas.'), 'error')),
     refreshDashboard().catch(() => showToast(t('Não foi possível carregar suas refeições.'), 'error')),
     loadWeight().catch(() => showToast(t('Não foi possível carregar seu histórico de peso.'), 'error')),
+    loadFitData().catch((error) => showToast(t('Não foi possível carregar seus treinos. {0}', describeDatabaseError(error)), 'error')),
   ]);
   appReady = true;
   // Conta nova ou perfil incompleto: o questionário abre e não pode ser dispensado.
   if (!isProfileComplete(nutritionProfile)) openGoalsDialog(true);
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=31').catch(() => {});
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js?v=34').catch(() => {});
 }
 
 // CSS e JS vêm do cache primeiro. Quando um service worker novo assume a página, os

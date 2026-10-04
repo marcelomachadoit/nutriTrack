@@ -75,6 +75,8 @@ function showView(viewName) {
   document.querySelectorAll('.view').forEach((view) => view.classList.toggle('active', view.dataset.view === viewName));
   document.querySelectorAll('.nav-item').forEach((item) => item.classList.toggle('active', item.dataset.target === viewName));
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  // FitTrack (fit-ui.js): mantém a barra e a navegação do app a que a tela pertence.
+  onViewShown(viewName);
   if (viewName === 'progresso') {
     loadWeek().catch((error) => showToast(t('Não foi possível carregar a semana. {0}', describeDatabaseError(error)), 'error'));
     loadWeight().catch((error) => showToast(t('Não foi possível carregar o peso. {0}', describeDatabaseError(error)), 'error'));
@@ -1776,7 +1778,10 @@ function renderSlotDraft() {
     handle.setAttribute('aria-label', t('Mover {0}. Use as setas para cima e para baixo.', slot.name || t('refeição')));
     handle.title = t('Arraste para reordenar');
     handle.append(createIcon('i-grip'));
-    attachSlotDrag(handle, row);
+    attachDragReorder(handle, row, (ordem) => {
+      slotDraft = ordem.map((posicao) => slotDraft[posicao]);
+      renderSlotDraft();
+    });
     // Sem ponteiro (teclado, leitor de tela) as setas fazem o mesmo trabalho.
     handle.addEventListener('keydown', (event) => {
       if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
@@ -1826,8 +1831,9 @@ function moveSlotDraft(from, to) {
 
 // Arrastar com pointer events cobre mouse e toque; a linha é movida no próprio DOM durante
 // o gesto (nada de re-renderizar no meio, que destruiria o elemento sob o dedo) e a ordem
-// só volta para o rascunho quando o gesto termina.
-function attachSlotDrag(handle, row) {
+// só volta para o rascunho quando o gesto termina. Cada linha precisa de data-index com a
+// posição original; onDrop recebe essas posições na ordem nova.
+function attachDragReorder(handle, row, onDrop) {
   handle.addEventListener('pointerdown', (event) => {
     if (event.button) return;
     event.preventDefault();
@@ -1856,9 +1862,7 @@ function attachSlotDrag(handle, row) {
       handle.removeEventListener('pointerup', onEnd);
       handle.removeEventListener('pointercancel', onEnd);
       row.classList.remove('dragging');
-      const ordem = [...list.children].map((item) => Number(item.dataset.index));
-      slotDraft = ordem.map((posicao) => slotDraft[posicao]);
-      renderSlotDraft();
+      onDrop([...list.children].map((item) => Number(item.dataset.index)));
     };
 
     handle.addEventListener('pointermove', onMove);
@@ -2180,12 +2184,6 @@ document.querySelector('#entry-recipe').addEventListener('change', updateEntryRe
 document.querySelectorAll('[data-close-dialog]').forEach((button) => button.addEventListener('click', () => closeDialog(button.dataset.closeDialog)));
 document.querySelector('[data-action="new-food"]').addEventListener('click', () => openFoodDialog());
 document.querySelector('[data-action="new-recipe"]').addEventListener('click', () => openRecipeDialog());
-// O logo leva ao Início, como o item da navegação inferior. preventDefault evita
-// deixar "#inicio" na barra de endereços, onde a leitura dos links de e-mail procura parâmetros.
-document.querySelector('.brand').addEventListener('click', (event) => {
-  event.preventDefault();
-  showView('inicio');
-});
 document.querySelector('[data-action="theme"]').addEventListener('click', toggleTheme);
 document.querySelector('[data-action="language"]').addEventListener('click', (event) => {
   event.stopPropagation();
